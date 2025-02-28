@@ -1,0 +1,6 @@
+# Secrets & Config Files
+client_secrets.json
+.env
+
+# Database
+db.sqlite3
