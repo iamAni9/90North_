@@ -70,7 +70,12 @@ def connect_google_drive(request):
     # Set up the OAuth flow
     flow = Flow.from_client_secrets_file(
         settings.GOOGLE_DRIVE_CLIENT_SECRETS_FILE,
-        scopes=['https://www.googleapis.com/auth/drive'],
+        scopes=[
+            'https://www.googleapis.com/auth/drive',
+            'openid',
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/userinfo.profile'
+        ],
         redirect_uri=request.build_absolute_uri('/auth/google/drive/callback/')
     )
 
@@ -83,7 +88,7 @@ def connect_google_drive(request):
 
     # Store the state in the session for later validation
     request.session['google_drive_state'] = state
-
+    # print(f"---------------- Authorization url: {authorization_url} -------------------")
     return redirect(authorization_url)
 
 def google_drive_callback(request):
@@ -94,7 +99,12 @@ def google_drive_callback(request):
     # Set up the OAuth flow
     flow = Flow.from_client_secrets_file(
         settings.GOOGLE_DRIVE_CLIENT_SECRETS_FILE,
-        scopes=['https://www.googleapis.com/auth/drive'],
+        scopes=[
+            'https://www.googleapis.com/auth/drive',
+            'openid',
+            'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/userinfo.profile'
+        ],
         redirect_uri=request.build_absolute_uri('/auth/google/drive/callback/')
     )
 
