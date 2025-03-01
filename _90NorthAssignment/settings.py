@@ -176,6 +176,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Or 'django.contrib.sessions.backends.cache'
+SESSION_COOKIE_NAME = 'sessionid'  # Default session cookie name
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Recommended for security
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
