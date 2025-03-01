@@ -60,7 +60,7 @@ def google_callback(request):
 
     return JsonResponse({
         'id': extra_data.get('id'),
-        'access_token': token.token,
+        'code': code,
         'email': extra_data.get('email'),
         'name': extra_data.get('name'),
         'picture': extra_data.get('picture'),
@@ -74,10 +74,11 @@ def connect_google_drive(request):
         redirect_uri=request.build_absolute_uri('/auth/google/drive/callback/')
     )
 
-    # Generate the authorization URL
+    # Generate the authorization URL with offline access and forced consent
     authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true'
+        access_type='offline',   # Ensures we get a refresh token
+        include_granted_scopes='true',
+        prompt='consent'   # Forces Google to show consent screen every time
     )
 
     # Store the state in the session for later validation
@@ -104,12 +105,19 @@ def google_drive_callback(request):
     credentials = flow.credentials
     request.session['google_drive_credentials'] = {
         'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
+        'refresh_token': credentials.refresh_token,  # May be None if already authorized
         'token_uri': credentials.token_uri,
         'client_id': credentials.client_id,
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes,
     }
+
+    # If refresh_token is missing, warn the user
+    if not credentials.refresh_token:
+        return JsonResponse({
+            'message': 'Google Drive connected, but no refresh token received! '
+                       'Try disconnecting and reconnecting your Google account.'
+        })
 
     return JsonResponse({'message': 'Google Drive connected successfully!'})
 
