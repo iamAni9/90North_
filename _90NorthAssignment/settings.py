@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*3pv^5hj-&^&fz7gneo7v477^92fu4xu(n^9t!31&!_jh#8ut3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['https://nine0northassignment.onrender.com/']
 
 
 # Application definition
@@ -116,7 +116,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = 'login'
+# LOGIN_URL = 'login'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 WSGI_APPLICATION = '_90NorthAssignment.wsgi.application'
 
