@@ -8,7 +8,8 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from django.conf import settings
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaIoBaseUpload, MediaIoBaseDownload
+import io
 
 def google_login(request):
     return redirect('/accounts/google/login/')
@@ -142,34 +143,56 @@ def upload_to_google_drive(request):
         return JsonResponse({'error': 'No file provided'}, status=400)
 
     # Load credentials from the session
-    credentials = Credentials(**request.session['google_drive_credentials'])
+    credentials_dict = request.session.get('google_drive_credentials')
+    if not credentials_dict:
+        return JsonResponse({'error': 'Google Drive not authenticated'}, status=401)
+
+    credentials = Credentials(**credentials_dict)
 
     # Build the Google Drive API client
     service = build('drive', 'v3', credentials=credentials)
 
     # Upload the file
     file_metadata = {'name': file.name}
-    media = MediaFileUpload(file.temporary_file_path(), mimetype=file.content_type)
+    media = MediaIoBaseUpload(io.BytesIO(file.read()), mimetype=file.content_type, resumable=True)
+
     uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
-    return JsonResponse({'file_id': uploaded_file.get('id')})
+    return JsonResponse({'message': 'File uploaded successfully', 'file_id': uploaded_file.get('id')})
 
 @csrf_exempt
 def download_from_google_drive(request, file_id):
     # Load credentials from the session
-    credentials = Credentials(**request.session['google_drive_credentials'])
+    credentials_dict = request.session.get('google_drive_credentials')
+    if not credentials_dict:
+        return JsonResponse({'error': 'Google Drive not authenticated'}, status=401)
+
+    credentials = Credentials(**credentials_dict)
 
     # Build the Google Drive API client
     service = build('drive', 'v3', credentials=credentials)
 
-    # Fetch the file metadata
-    file_metadata = service.files().get(fileId=file_id, fields='name').execute()
+    try:
+        # Fetch file metadata
+        file_metadata = service.files().get(fileId=file_id, fields='name').execute()
+        file_name = file_metadata['name']
 
-    # Download the file
-    request = service.files().get_media(fileId=file_id)
-    response = request.execute()
+        # Request the file content
+        request = service.files().get_media(fileId=file_id)
+        file_stream = io.BytesIO()
+        downloader = MediaIoBaseDownload(file_stream, request)
 
-    # Return the file as a downloadable response
-    response = HttpResponse(response, content_type='application/octet-stream')
-    response['Content-Disposition'] = f'attachment; filename="{file_metadata["name"]}"'
-    return response
+        done = False
+        while not done:
+            status, done = downloader.next_chunk()
+
+        # Move to the beginning of the stream
+        file_stream.seek(0)
+
+        # Return the file as a downloadable response
+        response = HttpResponse(file_stream, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
