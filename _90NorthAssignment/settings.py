@@ -110,9 +110,9 @@ SOCIALACCOUNT_PROVIDERS = {
         # 'SCOPE': ['profile','email',],
         'SCOPE': [
             'openid',
-            'https://www.googleapis.com/auth/drive',
             'https://www.googleapis.com/auth/userinfo.profile',
             'https://www.googleapis.com/auth/userinfo.email',
+            'https://www.googleapis.com/auth/drive',
             ],
          'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
