@@ -58,7 +58,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = '_90NorthAssignment.urls'
-SITE_ID = 1
+SITE_ID = 4
 
 TEMPLATES = [
     {
