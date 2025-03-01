@@ -107,7 +107,13 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
           
         },
-        'SCOPE': ['profile','email',],
+        # 'SCOPE': ['profile','email',],
+        'SCOPE': [
+            'openid',
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',
+            ],
          'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
