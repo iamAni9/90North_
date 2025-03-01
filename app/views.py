@@ -60,6 +60,7 @@ def google_callback(request):
 
     return JsonResponse({
         'id': extra_data.get('id'),
+        'access_token': token.token,
         'email': extra_data.get('email'),
         'name': extra_data.get('name'),
         'picture': extra_data.get('picture'),
