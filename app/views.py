@@ -122,6 +122,7 @@ def google_drive_callback(request):
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes,
     }
+    # print(f"------------- Drive credentials = {request.session['google_drive_credentials']} ---------------")
 
     # If refresh_token is missing, warn the user
     if not credentials.refresh_token:
@@ -130,7 +131,8 @@ def google_drive_callback(request):
                        'Try disconnecting and reconnecting your Google account.'
         })
 
-    return JsonResponse({'message': 'Google Drive connected successfully!'})
+    return JsonResponse({'message': 'Google Drive connected successfully!',
+                         'credentials': credentials})
 
 @csrf_exempt
 def upload_to_google_drive(request):
